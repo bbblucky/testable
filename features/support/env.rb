@@ -1,5 +1,6 @@
 require "capybara/cucumber"
 require "selenium-webdriver"
+require "faker"
 
 Capybara.configure do |config|
   config.run_server = false
