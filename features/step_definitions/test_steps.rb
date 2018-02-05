@@ -10,6 +10,11 @@ Given /^I am not logged in/ do
   visit('/sign_out')
 end
 
+Given /^I am a new user$/ do
+  step "I am on homepage"
+  step 'I click "Sign Up"'
+  step "I sign up with valid info"
+end
 
 When /^I click "([^"]*)"$/ do |key|
   click_link key
@@ -41,6 +46,14 @@ Then /^I should see course "([^"]*)" with author "([^"]*)"$/ do |course, author|
   expect(page).to have_xpath(xpath)
 end
 
+Then /^I should see "([^"]*)" course page$/ do |course_name|
+  expect(page).to have_xpath("//h1[@class='course-title' and contains(text(),'#{course_name}')]")
+  expect(page).to have_xpath("//h2[contains(text(),'Your Instructor')]")
+  expect(page).to have_xpath("//h2[contains(text(),'Class Curriculum')]")
+  expect(page).to have_css('div.course-section')
+  expect(page).to have_css('div.faq-question')
+  expect(page).to have_css('div.faq-answer')
+end
 
 Then /^I should be redirect to "([^"]*)" page$/ do |page|
   current_path.should == "/#{page}"
@@ -52,6 +65,31 @@ end
 
 When /^I check "([^"]*)"$/ do |checkbox|
   check(checkbox)
+end
+
+When /^I try to enroll the course$/ do
+  page.find(:xpath, "//button[@id='enroll-button-top']").click
+end
+
+Then /^I should see enrollment successful$/ do
+  expect(page).to have_xpath("//h1[contains(text(),'Thanks for enrolling in this course!')]")
+  expect(page).to have_xpath("//p[contains(text(),'Your order ID:')]")
+  expect(page).to have_xpath("//p[contains(text(),'You will shortly receive an email confirmation at')]")
+  expect(page).to have_xpath("//strong[contains(text(),'#{@email}')]")
+  expect(page).to have_xpath("//a[contains(text(),'Continue to Course')]")
+end
+
+Then /^I should see enrolled course "([^"]*)" page$/ do |course_name|
+  # verify left side bar
+  expect(page).to have_xpath("//div[@class='course-sidebar']//h2[text()='#{course_name}']")
+  expect(page).to have_xpath("//div[@class='course-sidebar']//div[@class='course-progress']")
+  expect(page).to have_link('Class Curriculum')
+  expect(page).to have_link('Your Instructor')
+
+  #verify course main section
+  expect(page).to have_content('Class Curriculum')
+  expect(page).to have_link('Start next lecture')
+  expect(page).to have_css('div.row div.course-section')
 end
 
 Then /^Sleep$/ do
