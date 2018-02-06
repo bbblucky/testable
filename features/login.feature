@@ -1,4 +1,5 @@
-Feature: User can login with valid username and password.
+Feature: Log in
+  User can login with valid username and password.
 
   Scenario: User can log in from login link and redirect to courses page
     Given I am on homepage

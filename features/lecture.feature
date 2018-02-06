@@ -1,5 +1,6 @@
-Feature: user can go to enrolled course from my courses page,
-         and user can view each lecture within the enrolled course.
+Feature: Lecture detail
+  user can go to enrolled course from my courses page,
+  and user can view each lecture within the enrolled course.
 
   Scenario: Verify use can go to enrolled course from my course page
     Given I am a user enrolled take home test

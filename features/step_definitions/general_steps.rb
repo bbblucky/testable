@@ -14,7 +14,11 @@ Given /^I am on "([^"]*)" page/ do |page|
 end
 
 Given /^I am not logged in/ do
-  visit('/sign_out')
+  step 'I click "Login"'
+  if page.has_css?('div.welcome-back-sso')
+    click_link "No Thanks, I'd Like to Log Out"
+  end
+  step 'I am on homepage'
 end
 
 Given /^I am a new user$/ do
@@ -49,6 +53,9 @@ Then /^I (should|should not) see text "([^"]*)"$/ do |expectation, text_content|
 end
 
 When /^I sign up with valid info$/ do
+  if page.has_css?('div.welcome-back-sso')
+    click_link "No Thanks, I'd Like to Log Out"
+  end
   @email = Faker::Internet.safe_email
   @name = Faker::Name.name
   fill_in('Full Name', with: @name)
@@ -60,15 +67,16 @@ When /^I sign up with valid info$/ do
 end
 
 When /^I login with valid info$/ do
-  fill_in('Email Address', with: 'yi@example.com')
-  fill_in('Password', with: 'Test1234')
-  page.find(:xpath, "//input[@value='Log In']").click
+  step 'login with username "yi@example.com" and password "Test1234"'
 end
 
 When /^login with username "([^"]*)" and password "([^"]*)"$/ do |usr, pwd|
   if page.has_xpath?("//p[text()='#{usr}']")
     click_link 'Continue as'
   else
+    if page.has_css?('div.welcome-back-sso') && !page.has_xpath?("//p[text()='#{usr}']")
+      click_link 'Log In with a School Account'
+    end
     fill_in('Email Address', with: usr)
     fill_in('Password', with: pwd)
     page.find(:xpath, "//input[@value='Log In']").click
@@ -126,6 +134,10 @@ Then /^I should see enrolled course "([^"]*)" page$/ do |course_name|
   expect(page).to have_css('div.row div.course-section')
 end
 
-Then /^Sleep$/ do
-  sleep 100
+Then /^Stop/ do
+  sleep 1000
+end
+
+Then /^Sleep/ do
+  sleep 1
 end
