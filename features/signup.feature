@@ -1,4 +1,4 @@
-Feature: Sign up
+Feature: user can sign up by fill in the sign up form.
 
   Scenario: User will redirect to sign up page if he doesn't login
     Given I am on homepage
