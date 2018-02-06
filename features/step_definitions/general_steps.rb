@@ -3,7 +3,14 @@ Given /^I am on homepage$/ do
 end
 
 Given /^I am on "([^"]*)" page/ do |page|
-  visit("/#{page}")
+  case page
+    when 'My Courses'
+      visit('/courses/enrolled')
+    when 'All Courses'
+      visit('/courses')
+    else
+      visit("/#{page}")
+  end
 end
 
 Given /^I am not logged in/ do
@@ -11,17 +18,34 @@ Given /^I am not logged in/ do
 end
 
 Given /^I am a new user$/ do
-  step "I am on homepage"
+  step 'I am on homepage'
   step 'I click "Sign Up"'
-  step "I sign up with valid info"
+  step 'I sign up with valid info'
+end
+
+When /^I am on enrolled course "([^"]*)" page$/ do |course|
+  step 'I click "' + course + '"'
+  step 'I try to enroll the course'
+  step 'I click "Continue to Course"'
 end
 
 When /^I click "([^"]*)"$/ do |key|
   click_link key
 end
 
-Then /^I should see text "([^"]*)"$/ do |text_content|
-  expect(page).to have_xpath("//*[contains(text(),'#{text_content}')]")
+When /^I click "([^"]*)" within "([^"]*)" section$/ do |key, section|
+  within(:xpath, "//div[contains(@class,'course-section') and div[contains(.,'#{section}')]]") do
+    click_link key
+  end
+end
+
+Then /^I (should|should not) see text "([^"]*)"$/ do |expectation, text_content|
+  xpath = "//*[contains(text(),'#{text_content}')]"
+  if expectation == 'should'
+    expect(page).to have_xpath(xpath)
+  else
+    expect(page).not_to have_xpath(xpath)
+  end
 end
 
 When /^I sign up with valid info$/ do
@@ -39,6 +63,16 @@ When /^I login with valid info$/ do
   fill_in('Email Address', with: 'yi@example.com')
   fill_in('Password', with: 'Test1234')
   page.find(:xpath, "//input[@value='Log In']").click
+end
+
+When /^login with username "([^"]*)" and password "([^"]*)"$/ do |usr, pwd|
+  if page.has_xpath?("//p[text()='#{usr}']")
+    click_link 'Continue as'
+  else
+    fill_in('Email Address', with: usr)
+    fill_in('Password', with: pwd)
+    page.find(:xpath, "//input[@value='Log In']").click
+  end
 end
 
 Then /^I should see course "([^"]*)" with author "([^"]*)"$/ do |course, author|
